@@ -617,13 +617,13 @@ R.h2 = root => {
 };
 function hydrogenBidding(root) {
   const box = (t, body, bg = '#f7f9fc') => `<div style="background:${bg};border:1px solid var(--line);border-radius:10px;padding:10px 12px"><b style="color:var(--navy)">${t}</b><div style="margin-top:3px">${body}</div></div>`;
-  root.append(H('div', { style: 'margin-top:22px' }, `<h2 style="margin:0 0 4px;font-size:19px;color:var(--navy)">수소발전 입찰시장 (CHPS)</h2><div style="color:var(--sub);font-size:12.5px">수소로 만든 전기를 15~20년간 정해진 가격에 사 주는 경쟁입찰. 연료전지 중심의 <b>일반수소</b>(2023~)와 가스터빈 혼소·전소 중심의 <b>청정수소</b>(2024~) 시장으로 나뉘며 전력거래소가 운영.</div><div class="note" style="margin-top:4px">2026년 일정·조건은 KPX 사업자 설명회(2026.10) 운영계획안 기준이며, 최종 내용은 입찰공고로 확인 필요.</div>`));
+  root.append(H('div', { style: 'margin-top:22px' }, `<h2 style="margin:0 0 4px;font-size:19px;color:var(--navy)">수소발전 입찰시장 (CHPS)</h2><div style="color:var(--sub);font-size:12.5px">수소로 만든 전기를 15~20년간 정해진 가격에 사 주는 경쟁입찰. 연료전지 중심의 <b>일반수소</b>(2023~)와 가스터빈 혼소·전소 중심의 <b>청정수소</b>(2024~) 시장으로 나뉘며 전력거래소가 운영.</div><div class="note" style="margin-top:4px">2026년 일정·조건은 KPX 최종 입찰공고(2026-10-30, 공고 제2026-09호 일반·제2026-10호 청정) 기준. 공고상 일정은 사업자 평가 등에 따라 변경될 수 있음.</div>`));
   const sched = rows => `<table class="t" style="margin-top:6px">${rows.map(([a, b]) => `<tr><td style="width:46%">${a}</td><td class="l"><b>${b}</b></td></tr>`).join('')}</table>`;
   const now = H('div', { class: 'grid g2', style: 'margin-top:10px' });
-  const g1 = card('2026 일반수소발전 입찰 <span class="badge h2">공고 예정</span>', '개설물량 930GWh/년 · 상업운전 2028년 · 준비 2년 + 거래 20년');
-  g1.innerHTML += `<div>대상: <b>신설 전소 수소발전기</b>(RPS 등록 이력 없는 연료전지 등). 입찰 단계 발전사업허가 요건 삭제(우협 후 6개월 내 허가), CCUS 평가 신설, 청정수소 활용·에너지효율 배점 강화.</div>` + sched([['입찰공고', "'26.10월 말"], ['입찰자 등록', "'26.11월 말"], ['입찰제안서 제출', "'26.12월 초"], ['우선협상대상자 발표', "'26.12월 말"], ['낙찰자 발표', "'27.7월 중"], ['계약체결', "'27.7월 말"]]);
-  const g2 = card('2026 청정수소발전 입찰 <span class="badge h2">공고 예정</span>', '개설물량 500GWh/년 · 상업운전 2029년(고시) · 준비 3년 + 거래 15년');
-  g2.innerHTML += `<div>대상: <b>LNG-수소 혼소(열량 20% 이상)·수소 전소</b> 발전기. 연료는 청정수소 인증기준(4kgCO₂e/kgH₂ 이하) 충족 필요(인증 예정 연료도 증빙 제출 가능). <b>석탄-암모니아 혼소 제외</b>, 국내 생산·공급망 기여를 평가.</div>` + sched([['입찰공고', "'26.10월 말"], ['입찰자 등록', "'27.5월 초"], ['입찰제안서·증빙 제출', "'27.5월 말"], ['우선협상대상자 발표', "'27.6월 중순"], ['낙찰자 발표', "'27.6월 말"], ['계약체결', "'27.7월"]]) + `<div class="note">2025년 입찰(3,000GWh)은 2025-10-17 취소. 고시상 상업운전(2029)과 계약 후 준비 3년의 관계는 미확인.</div>`;
+  const g1 = card('2026 일반수소발전 입찰 <span class="badge h2">공고 10/30</span>', '개설물량 930GWh/년 · 준공기한 계약체결 후 24개월 · 거래 20년');
+  g1.innerHTML += `<div>대상: <b>신설 전소 수소발전기</b>(RPS 등록 이력 없는 연료전지 등). 입찰 단계 발전사업허가 요건 삭제(우협 후 6개월 내 허가), CCUS 평가 신설, 청정수소 활용·에너지효율 배점 강화.</div>` + sched([['입찰공고', "'26.10.30(금)"], ['입찰자 등록', "'26.11.23~11.27"], ['입찰제안서·증빙 제출(공고 마감)', "'26.11.30~12.4"], ['우선협상대상자 발표', "'26.12.30"], ['이의신청·우선협상대상자 등록', "'26.12.31~'27.1.7"], ['발전사업허가 마감', "'27.6.30"], ['낙찰자 발표·계약체결', "'27.1·3·5·7월(허가 취득 순, 4차)"]]) + `<div class="note">누적 낙찰물량 상한 개설물량의 105%. 설명회 계획안의 낙찰 '27.7월 일괄 → 허가 취득 시기별 4차 순차 발표로 확정.</div>`;
+  const g2 = card('2026 청정수소발전 입찰 <span class="badge h2">공고 10/30</span>', '개설물량 500GWh/년 · 상업운전 2029년(고시) · 준공기한 계약체결 후 36개월 · 거래 15년');
+  g2.innerHTML += `<div>대상: <b>LNG-수소 혼소(열량 20% 이상)·수소 전소</b> 발전기. 연료는 청정수소 인증기준(4kgCO₂e/kgH₂ 이하) 충족 필요(인증 예정 연료도 증빙 제출 가능). <b>석탄-암모니아 혼소 제외</b>, 국내 생산·공급망 기여를 평가.</div>` + sched([['입찰공고', "'26.10.30(금)"], ['입찰자 등록', "'27.4.26~5.7"], ['입찰제안서·증빙 제출(공고 마감)', "'27.5.10~5.28"], ['우선협상대상자 발표', "'27.6.18"], ['이의신청·우선협상대상자 등록', "'27.6.21~6.25"], ['낙찰자 발표·계약체결', "'27.6~7월"]]) + `<div class="note">2025년 입찰(3,000GWh)은 2025-10-17 취소. 누적 낙찰물량 상한 개설물량의 110%, 적격 입찰물량 경쟁률이 1.15:1 미만이면 선정물량 조정 가능. 입찰자 등록이 설명회 계획안('27.5월 초)보다 앞당겨짐. 고시상 상업운전(2029)과 준공기한(계약 후 36개월)의 관계는 미확인.</div>`;
   now.append(g1, g2); root.append(now);
   const how = card('낙찰가는 어떻게 정해지나', '');
   how.style.marginTop = '14px';
@@ -631,7 +631,7 @@ function hydrogenBidding(root) {
    ${box('① 가격 쓰기', '수소발전 1kWh 총비용(LCOE)을 입찰<br>· 일반: 고정비 + 연료비 + 배출비<br>· 청정: 고정비 + 운영비 + 연료비<br>물량 = 설비용량 × 8,760시간 × 이용률(× 혼소율)')}
    ${box('② 상한가 걸러내기', '비공개 상한가격을 하나라도 넘으면 탈락<br>· 일반: <b>고정비·연료비·배출비·총액</b><br>· 청정: <b>총 LCOE·연료비 Index</b> (제안서 마감 직후 설정)')}
    ${box('③ 점수 매기기', '<b>가격점수 = (최저 입찰가 ÷ 내 입찰가) × 배점</b><br>· 일반: 가격 60 + 비가격 40<br>· 청정: 1차 비가격 상위(물량 150% 이내) → 2차 가격 50 + 비가격 50<br>비가격 = 주민수용성, 산업기여, 온실가스 감축, 연료조달, 계통 입지 등')}
-   ${box('④ 낙찰과 계약', '총점 높은 순으로 개설물량(최대 110%)까지 낙찰. <b>계약가격 = 내가 쓴 입찰가</b>(Pay as Bid). 구매자는 한전·구역전기사업자, 용량요금(CP)은 미지급')}
+   ${box('④ 낙찰과 계약', '총점 높은 순으로 개설물량까지 낙찰(누적 상한: 일반 105%·청정 110%). <b>계약가격 = 내가 쓴 입찰가</b>(Pay as Bid). 구매자는 한전·구역전기사업자, 용량요금(CP)은 미지급')}
   </div>
   <div class="grid g2" style="gap:10px;margin-top:10px">
    ${box('⑤ 돈은 어떻게 받나 (차액정산, CfD)', '전력시장에서 <b>SMP</b>를 받고, 이행 발전량에 대해 <b>(사후조정 계약가격 − SMP)</b>를 추가 정산. SMP가 더 높으면 차액을 반환. 미이행·초과물량·음수 SMP 등은 예외가 있어 계약가가 절대 보장되진 않음.', '#eef6ff')}
@@ -651,17 +651,18 @@ function hydrogenBidding(root) {
   const r1 = card('일반수소발전 입찰 결과 (2023~2025)', '공고물량 · 입찰물량 · 낙찰물량 (GWh/년)');
   const r2 = card('청정수소발전 입찰 결과', '낙찰 발전소명·낙찰가는 공식 발표에서 비공개');
   res.append(r1, r2); root.append(res);
-  const gen = [{ y: '2023', ann: 1300, bid: 6962, win: 1430, n: 24, cr: '5.36:1' }, { y: '2024', ann: 1300, bid: 3490, win: 1315, n: 16, cr: '2.68:1' }, { y: '2025', ann: 1300, bid: 3137, win: 1355, n: 52, cr: '2.41:1' }, { y: '2026', ann: 930, bid: null, win: null, n: null, cr: '공고 예정' }];
+  const gen = [{ y: '2023', ann: 1300, bid: 6962, win: 1430, n: 24, cr: '5.36:1' }, { y: '2024', ann: 1300, bid: 3490, win: 1315, n: 16, cr: '2.68:1' }, { y: '2025', ann: 1300, bid: 3137, win: 1355, n: 52, cr: '2.41:1' }, { y: '2026', ann: 930, bid: null, win: null, n: null, cr: '공고(10/30)' }];
   chart(r1, { labels: gen.map(g => g.y), series: [{ name: '공고물량', values: gen.map(g => g.ann), color: '#94a3b8', type: 'bar' }, { name: '입찰물량', values: gen.map(g => g.bid), color: '#7fd3cf', type: 'bar' }, { name: '낙찰물량', values: gen.map(g => g.win), color: '#0b6d69', type: 'bar' }], height: 210, tipFmt: v => v == null ? '-' : fmt(v) + ' GWh', yFmt: v => fmt(v), xw: 40 });
   r1.insertAdjacentHTML('beforeend', `<table class="t"><tr><th>연도</th><th>경쟁률</th><th>낙찰 발전기</th><th>평균 물량</th></tr>${gen.slice(0, 3).map(g => `<tr><td>${g.y}</td><td>${g.cr}</td><td>${g.n}기</td><td>${fmt(g.win / g.n)} GWh</td></tr>`).join('')}</table><div class="note">KPX 표기 누적 낙찰 4,099GWh/년(연도별 표기값 단순합 4,100GWh/년) · 92기 · 평균 설비 10MW 미만 · 수도권 비중 55% 이상. <b>낙찰가 수치는 비공개</b>이며, 정부는 “평균 낙찰가격이 2023년 도입 이후 계속 하락”, KPX는 “RPS 대비 발전단가 약 12% 하락”이라고만 밝힘. 2023년은 상·하반기 합산. 2024년 낙찰량은 정부 고시 1,314GWh·KPX 1,315GWh로 표기 차이.</div>`);
   r2.innerHTML += `<table class="t"><tr><th>연도</th><th>공고물량</th><th>결과</th></tr>
    <tr><td>2024 (최초)</td><td>6,500GWh</td><td class="l">5개사 6개 발전소가 6,172GWh 입찰(경쟁률 0.95:1) → <b>1개 발전소 750GWh/년 낙찰</b>. 2028년 상업운전, 최대 15년</td></tr>
    <tr><td>2025</td><td>3,000GWh</td><td class="l"><b>입찰 취소</b> (2025-10-17 KPX 공고)</td></tr>
-   <tr><td>2026</td><td>500GWh</td><td class="l">공고 예정('26.10월 말). 석탄-암모니아 혼소 제외, 가격 50 : 비가격 50 (2025년 공고 60:40)</td></tr></table>
+   <tr><td>2026</td><td>500GWh</td><td class="l">10/30 공고(입찰자 등록 '27.4.26~5.7). 석탄-암모니아 혼소 제외, 가격 50 : 비가격 50 (2025년 공고 60:40)</td></tr></table>
    <div class="grid g2" style="gap:10px;margin-top:10px">${box('연도별 구매계획량 (고시, 누적 GWh)', '일반: 2025 1,430 → 2026 2,744 → 2027 4,099 → 2028 5,029<br>청정: 2027 750 → 2028 750 → 2029 1,250')}${box('2027년 이후', '개설물량은 제12차 전력수급기본계획 등을 반영해 2027년 고시 개정으로 설정 예정')}</div>`;
   const src = card('출처 · 관련 공지', '');
   src.style.marginTop = '14px';
   src.innerHTML += `<ul style="margin:0;padding-left:18px;font-size:13px">
+   <li><a href="https://www.kpx.or.kr/board.es?mid=a11201000000&bid=0042&act=view&list_no=78440" target="_blank">KPX 2026년 일반수소발전시장 경쟁입찰 공고(제2026-09호)</a> · <a href="https://www.kpx.or.kr/board.es?mid=a11201000000&bid=0042&act=view&list_no=78441" target="_blank">청정수소발전시장 경쟁입찰 공고(제2026-10호)</a> (2026-10-30)</li>
    <li><a href="https://www.kpx.or.kr/board.es?mid=a11201000000&bid=0042&act=view&list_no=78280" target="_blank">KPX ‘26년 수소발전 입찰시장 사업자 설명회 자료(일반·청정)</a></li>
    <li><a href="https://me.go.kr/home/web/board/read.do?boardMasterId=939&menuId=10598&boardId=1869030" target="_blank">기후에너지환경부 2026-06-08 행정예고(초안)</a> · <a href="https://www.khfcia.com/21/?bmode=view&amp;idx=172987277&amp;t=board" target="_blank">최종 고시 제2026-201호(2026-08-07) 정부 PDF 재게시본</a> · 개설물량·구매계획과 실제 낙찰·발전량은 다름</li>
    <li><a href="https://www.motir.go.kr/kor/article/ATCL3f49a5a8c/170807/view" target="_blank">산업부 2025-08-14 “일반수소발전 경쟁입찰 결과”</a> · <a href="https://english.motir.go.kr/eng/article/EATCLdfa319ada/2153/view" target="_blank">2024-12-02 청정수소 입찰 결과</a></li>
