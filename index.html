@@ -110,6 +110,7 @@ footer{color:var(--sub);font-size:11.5px;text-align:center;padding:10px 0 30px}
   <section class="tab" id="t-supply"></section>
   <section class="tab" id="t-rec"></section>
   <section class="tab" id="t-h2"></section>
+  <section class="tab" id="t-hist"></section>
   <section class="tab" id="t-src"></section>
   <section class="tab" id="t-audit"></section>
 </main>
@@ -278,7 +279,7 @@ const nPartial = stVals.filter(s=>s.state==='partial').length;
 const nBad = stVals.filter(s => s.state === 'failed' || s.state === 'unavailable').length, nRet = stVals.filter(s => s.state === 'retained').length;
 $('#hpills').innerHTML = `<span class="pill">수집·파싱 ${stVals.length}개 중 성공 ${stVals.filter(s => s.state === 'fresh').length}</span>` + (nPartial ? `<span class="pill warn">부분 성공 ${nPartial}</span>` : '') + (nRet ? `<span class="pill warn">이전값 유지 ${nRet}</span>` : '') + (nBad ? `<span class="pill bad">실패 ${nBad}</span>` : '') + (D.smpToday ? `<span class="pill">육지 SMP ${fmt(S.wavg, 2)}원/kWh</span>` : '') + (D.realtime ? `<span class="pill">예비율 ${D.realtime.reserveRate}% (${D.realtime.date} ${D.realtime.time})</span>` : '') + (D.h2.last ? `<span class="pill">수소 ${fmt(D.h2.last.national)}원/kg</span>` : '');
 
-const TABS = [['overview', '종합 브리핑'], ['price', '전력가격(SMP)'], ['model', 'SMP 추정'], ['supply', '수급·발전'], ['rec', 'REC·연료'], ['h2', '수소시장'], ['src', '출처·정의'], ['audit', '검수 내역']];
+const TABS = [['overview', '종합 브리핑'], ['price', '전력가격(SMP)'], ['model', 'SMP 추정'], ['supply', '수급·발전'], ['rec', 'REC·연료'], ['h2', '수소시장'], ['hist', '브리핑 히스토리'], ['src', '출처·정의'], ['audit', '검수 내역']];
 const rendered = {};
 function openTab(k) {
   document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.k === k));
@@ -311,6 +312,8 @@ R.overview = root => {
     if ((b.issues || []).length) { const lab = (t, c) => `<span style="display:inline-block;min-width:44px;font-size:11.5px;font-weight:700;color:${c}">${t}</span>`; bc.innerHTML += `<div class="box" style="margin-top:12px"><b style="font-size:15px">주요 이슈와 시사점</b>${b.issues.map(it => `<div style="margin-top:10px"><b>▪ ${it.tag ? `<span class="badge ${/수소|H2|FCEV|모빌리티|생산|현대/.test(it.tag) ? 'h2' : 'mk'}">${esc(it.tag)}</span> ` : ''}${esc(it.h)}</b>${it.fact ? `<div style="padding-left:14px;color:#334155">${lab('사실', '#5b6577')}${esc(it.fact)}</div>` : ''}${it.insight ? `<div style="padding-left:14px;color:#0f172a">${lab('시사점', '#0b2e6b')}${esc(it.insight)}</div>` : ''}${it.next ? `<div style="padding-left:14px;color:#334155">${lab('체크', '#b45309')}${esc(it.next)}</div>` : ''}</div>`).join('')}</div>`; }
     if (b.smpWhy && (b.smpWhy.items || []).length) bc.innerHTML += `<div class="box" style="margin-top:12px"><b style="font-size:15px">${esc(b.smpWhy.title || '오늘 SMP 등락 요인')}</b>${b.smpWhy.items.map(it => `<div style="margin-top:8px"><b>▪ ${esc(it.h)}</b>${(it.d || []).map(x => `<div style="padding-left:14px;color:#334155">- ${esc(x)}</div>`).join('')}</div>`).join('')}</div>`;
   }
+  bc.append(H('div', { class: 'note' }, '<a href="#hist">지난 브리핑과 일별 지표 모아보기 →</a>'));
+  bc.querySelector('a[href="#hist"]').addEventListener('click', e => { e.preventDefault(); openTab('hist'); scrollTo(0, 0); });
   root.append(bc);
   const g = H('div', { class: 'grid g4', style: 'margin-top:14px' });
   g.append(
@@ -689,6 +692,77 @@ function newsExplorer(host) {
   }
   draw();
 }
+
+/* ---------------- 브리핑 히스토리 (2026-11-09) ---------------- */
+R.hist = root => {
+  root.innerHTML = '<div class="card"><div class="note" style="margin:0">기록을 불러오는 중…</div></div>';
+  const wd = d => '일월화수목금토'[new Date(d + 'T00:00:00Z').getUTCDay()];
+  const lab = (t, c) => `<span style="display:inline-block;min-width:44px;font-size:11.5px;font-weight:700;color:${c}">${t}</span>`;
+  const tagCls = t => /수소|H2|FCEV|모빌리티|생산|현대/.test(t || '') ? 'h2' : 'mk';
+  const briefHTML = x => {
+    const b = x.briefing;
+    if (!b) return '<div class="note" style="margin:4px 0">이날은 AI 브리핑 기록이 없습니다.</div>';
+    let s = `<div class="head" style="font-size:16px;margin:2px 0 6px">${esc(b.headline)}</div><ul>${(b.keyPoints || []).map(k => `<li>${esc(k)}</li>`).join('')}</ul>`;
+    if ((b.issues || []).length) s += `<div class="box" style="margin-top:10px"><b>주요 이슈와 시사점</b>${b.issues.map(it => `<div style="margin-top:8px"><b>▪ ${it.tag ? `<span class="badge ${tagCls(it.tag)}">${esc(it.tag)}</span> ` : ''}${esc(it.h)}</b>${it.fact ? `<div style="padding-left:14px;color:#334155">${lab('사실', '#5b6577')}${esc(it.fact)}</div>` : ''}${it.insight ? `<div style="padding-left:14px">${lab('시사점', '#0b2e6b')}${esc(it.insight)}</div>` : ''}${it.next ? `<div style="padding-left:14px;color:#334155">${lab('체크', '#b45309')}${esc(it.next)}</div>` : ''}</div>`).join('')}</div>`;
+    if (b.smpWhy && (b.smpWhy.items || []).length) s += `<div class="box" style="margin-top:10px"><b>${esc(b.smpWhy.title || 'SMP 등락 요인')}</b>${b.smpWhy.items.map(it => `<div style="margin-top:6px"><b>▪ ${esc(it.h)}</b>${(it.d || []).map(d => `<div style="padding-left:14px;color:#334155">- ${esc(d)}</div>`).join('')}</div>`).join('')}</div>`;
+    s += `<div class="grid g3" style="margin-top:10px;gap:10px"><div class="box"><b>전력시장 해석</b><div>${esc(b.power || '')}</div></div><div class="box"><b>수소시장 해석</b><div>${esc(b.hydrogen || '')}</div></div><div class="box"><b>그날의 체크포인트</b><ul style="margin:4px 0 0;padding-left:18px">${(b.watch || []).map(w => `<li>${esc(w)}</li>`).join('')}</ul></div></div>`;
+    if ((b.newsPicks || []).length) s += `<div class="box" style="margin-top:10px"><b>주요 뉴스 픽</b><ul class="news" style="padding-left:0">${b.newsPicks.map(n => `<li><span class="badge ${tagCls(n.tag)}">${esc(n.tag || (n.lang === 'en' ? '해외' : '국내'))}</span><a href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.title)}</a><div class="m">${esc(n.source || '')} · ${tsK(n.pub)}</div>${n.why ? `<div class="w">→ ${esc(n.why)}</div>` : ''}</li>`).join('')}</ul></div>`;
+    if (b.caveat) s += `<div class="note">${esc(b.caveat)}</div>`;
+    s += `<div class="note">작성 ${tsK(b.generatedAt)} · ${esc(b.author || 'AI 브리핑')}</div>`;
+    return `<div class="brief" style="padding:6px 4px 6px 14px">${s}</div>`;
+  };
+  const show = A => {
+    const days = ((A && A.days) || []).filter(x => x && x.date).sort((a, b) => a.date.localeCompare(b.date));
+    root.innerHTML = '';
+    if (!days.length) { root.append(card('브리핑 히스토리', '아직 저장된 기록이 없습니다.')); return; }
+    const valid = days.filter(x => x.smp != null);
+    const mx = valid.reduce((a, b) => b.smp > a.smp ? b : a), mn = valid.reduce((a, b) => b.smp < a.smp ? b : a);
+    const nb = days.filter(x => x.briefing).length;
+    const g = H('div', { class: 'grid g4' });
+    g.append(
+      kpi('기록 기간', `${days.length}<small>일</small>`, '', `${days[0].date} ~ ${days.at(-1).date} · AI 브리핑 ${nb}건`),
+      kpi('기간 평균 SMP', fmt(avg(valid.map(x => x.smp)), 2), '원/kWh', `기준일별 육지 가중평균의 단순평균 · 160원 이상 누적 ${valid.reduce((s, x) => s + (x.hi160 || 0), 0)}시간`),
+      kpi(`기간 최고 SMP <span class="badge">${mx.smpDate}</span>`, fmt(mx.smp, 2), '원/kWh', `최고가 ${fmt(mx.smpMax, 1)}원 · 160원 이상 ${mx.hi160 ?? '-'}시간`),
+      kpi(`기간 최저 SMP <span class="badge">${mn.smpDate}</span>`, fmt(mn.smp, 2), '원/kWh', `최저가 ${fmt(mn.smpMin, 1)}원 · 일중 가격차 ${fmt(mn.spread, 1)}원`)
+    );
+    root.append(g);
+    const c1 = card('일별 SMP와 고가 시간', '선=육지 가중평균(원/kWh), 막대=하루 중 160원 이상인 시간 수(우축), 점선=그날 계산한 익월 SMP 추정');
+    c1.style.marginTop = '14px'; root.append(c1);
+    chart(c1, { labels: valid.map(x => x.date), series: [{ name: '160원 이상 시간(우축)', values: valid.map(x => x.hi160 ?? null), color: '#fde9b0', type: 'bar', axis: 'y2', tipFmt: v => (v ?? '-') + '시간' }, { name: '육지 SMP 가중평균', values: valid.map(x => x.smp), color: '#0b2e6b', width: 2.4, dots: true, tipFmt: v => fmt(v, 2) + ' 원' }, { name: '익월 SMP 추정', values: valid.map(x => x.fcSmp ?? null), color: '#d92d20', dash: '5 4', width: 1.6, tipFmt: v => fmt(v, 1) + ' 원' }], height: 250, xFmt: l => l.slice(5), xw: 44, y2Fmt: v => v + 'h', tipLabel: l => `${l} (${wd(l)})`, tipExtra: k => { const x = valid[k]; return `<div class="r"><span>최고/최저</span><b>${fmt(x.smpMax, 1)} / ${fmt(x.smpMin, 1)}</b></div>${x.briefing ? `<div style="max-width:320px;white-space:normal;margin-top:4px;color:#334155">${esc(x.briefing.headline)}</div>` : ''}`; } });
+    const c2 = card('일별 기록', '매일 아침 자동 갱신 시점의 핵심 지표와 AI 모닝 브리핑. 행을 누르면 그날 브리핑 전문이 열리고, 다시 누르면 닫힙니다.');
+    c2.style.marginTop = '14px'; root.append(c2);
+    const f = H('div', { class: 'filters' });
+    const inp = H('input', { placeholder: '브리핑 키워드 검색 (예: 입찰, LMP, 현대차, REC)' });
+    const cnt = H('span', { class: 'note', style: 'margin:0' });
+    const csvBtn = H('button', {}, 'CSV 다운로드');
+    const openAll = H('button', {}, '모두 펼치기');
+    f.append(inp, openAll, csvBtn, cnt); c2.append(f);
+    const wrap = H('div', { class: 'scroll' });
+    const tb = H('table', { class: 't' });
+    tb.innerHTML = '<thead><tr><th>기준일</th><th>육지 SMP</th><th>전일비</th><th>최고 / 최저</th><th>160원↑</th><th>최대부하 전망</th><th>전일 태양광·LNG</th><th>REC 육지</th><th>수소 충전가</th><th>익월 SMP 추정</th><th style="text-align:left">AI 브리핑 헤드라인</th></tr></thead>';
+    const tbody = H('tbody'); tb.append(tbody); wrap.append(tb); c2.append(wrap);
+    c2.append(H('div', { class: 'note' }, '기준일 = 대시보드 갱신일(SMP 거래일). 최대부하는 그날 전망과 공급예비율, 태양광·LNG는 전일 발전량 비중(양수·ESS 제외). REC는 그날 기준 최신 공식 거래속보(거래일 표기). 2026-10-28~30은 이전 노트북 게시본, 10-31은 갱신 기록 없음.'));
+    const map = new Map(days.map(x => [x.date, x]));
+    const seq = []; for (let d = days.at(-1).date; d >= days[0].date; d = addDays(d, -1)) seq.push(map.get(d) || { date: d, gap: true });
+    const rows = seq.map(x => {
+      if (x.gap) return { x, tr: H('tr', {}, `<td>${x.date.slice(5)} (${wd(x.date)})</td><td class="l" colspan="10" style="color:#94a3b8">자동 갱신 기록 없음</td>`), text: '' };
+      const tr = H('tr', { style: 'cursor:pointer', title: '눌러서 그날 브리핑 전문 보기' }, `<td><b>${x.date.slice(5)}</b> (${wd(x.date)})</td><td><b>${fmt(x.smp, 2)}</b></td><td>${chg(x.smpChg)}</td><td>${fmt(x.smpMax, 1)}<span style="color:var(--sub);font-size:11px">(${x.smpMaxH ?? '-'}h)</span> / ${fmt(x.smpMin, 1)}<span style="color:var(--sub);font-size:11px">(${x.smpMinH ?? '-'}h)</span></td><td>${x.hi160 ?? '-'}시간</td><td>${fmt(x.peak)}MW · ${x.peakRes ?? '-'}%</td><td>${x.solar ?? '-'}% · ${x.lng ?? '-'}%</td><td>${fmt(x.rec)} <span style="color:var(--sub);font-size:11px">${x.recDate ? x.recDate.slice(5) : ''}</span></td><td>${fmt(x.h2)}</td><td>${x.fcMonth ? `${+x.fcMonth.slice(5)}월 ${fmt(x.fcSmp, 1)}` : '-'}</td><td class="l" style="min-width:340px">${x.briefing ? esc(x.briefing.headline) : '<span style="color:#94a3b8">브리핑 없음</span>'}</td>`);
+      const r = { x, tr, text: (x.date + ' ' + JSON.stringify(x.briefing || {})).toLowerCase(), detail: null };
+      r.toggle = (open) => { const want = open ?? !r.detail; if (want && !r.detail) { r.detail = H('tr', {}, `<td colspan="11" style="text-align:left;white-space:normal;background:#fbfcfe">${briefHTML(x)}</td>`); tr.after(r.detail); tr.style.background = '#eef6ff'; } else if (!want && r.detail) { r.detail.remove(); r.detail = null; tr.style.background = ''; } };
+      tr.addEventListener('click', () => r.toggle());
+      return r;
+    });
+    rows.forEach(r => tbody.append(r.tr));
+    const filter = () => { const q = inp.value.trim().toLowerCase(); let n = 0; rows.forEach(r => { const ok = !q ? true : (!r.x.gap && r.text.includes(q)); r.tr.style.display = ok ? '' : 'none'; if (!ok && r.toggle) r.toggle(false); if (ok && !r.x.gap) n++; }); cnt.textContent = q ? `${n}일 일치` : `${days.length}일 기록`; };
+    inp.addEventListener('input', filter); filter();
+    let allOpen = false;
+    openAll.addEventListener('click', () => { allOpen = !allOpen; rows.forEach(r => { if (r.toggle && r.tr.style.display !== 'none') r.toggle(allOpen); }); openAll.textContent = allOpen ? '모두 접기' : '모두 펼치기'; });
+    const cols = [['date', '기준일'], ['smp', '육지SMP(원/kWh)'], ['smpChg', '전일비(%)'], ['smp7', '직전7일평균'], ['smpMax', '최고'], ['smpMaxH', '최고시간대(h)'], ['smpMin', '최저'], ['smpMinH', '최저시간대(h)'], ['spread', '일중가격차'], ['hi160', '160원이상시간'], ['jeju', '제주SMP'], ['tomorrow', '익일SMP(공표시)'], ['peak', '최대부하전망(MW)'], ['peakRes', '공급예비율(%)'], ['supDate', '전일실적일'], ['supPeak', '전일최대전력(MW)'], ['supRes', '전일예비율(%)'], ['fuelDate', '발전믹스일'], ['nuclear', '원자력%'], ['coal', '석탄%'], ['lng', 'LNG%'], ['solar', '태양광%'], ['wind', '풍력%'], ['rec', 'REC육지(원)'], ['recDate', 'REC거래일'], ['recVol', 'REC거래량'], ['h2', '수소충전가(원/kg)'], ['gas', 'KOGAS발전용(원/GJ)'], ['brent', 'Brent($/bbl)'], ['hh', 'HenryHub($/MMBtu)'], ['fx', '원달러'], ['monthAvg', '당월진행평균SMP'], ['fcMonth', '추정월'], ['fcSmp', 'SMP추정'], ['fcLo', '추정하단'], ['fcHi', '추정상단'], ['headline', '브리핑헤드라인']];
+    const cell = v => { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+    csvBtn.addEventListener('click', () => { const lines = [cols.map(c => c[1]).join(','), ...days.map(x => cols.map(([k]) => cell(k === 'headline' ? x.briefing?.headline : x[k])).join(','))]; const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\uFEFF' + lines.join('\n')], { type: 'text/csv;charset=utf-8' })); a.download = `h2-dashboard-history-${days.at(-1).date}.csv`; document.body.append(a); a.click(); a.remove(); });
+  };
+  fetch('archive.json?v=' + encodeURIComponent(D.generatedAt || '')).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(show).catch(e => { if (D.archive) show(D.archive); else root.innerHTML = `<div class="card"><div class="note" style="margin:0">히스토리 파일(archive.json)을 불러오지 못했습니다 (${esc(e.message)}).</div></div>`; });
+};
 
 R.src = root => {
   const DEF = {
