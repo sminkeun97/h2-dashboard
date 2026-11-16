@@ -618,6 +618,7 @@ R.h2 = root => {
   chart(c2, { labels: hh.map(x => x.date), series: [{ name: '전국 평균 (원/kg)', values: hh.map(x => x.v), color: '#0e9f9a', width: 2.2, dots: true }], height: 250, tipFmt: v => fmt(v) + ' 원', xFmt: l => l.slice(5) });
   if (hh.length < 3) c2.append(H('div', { class: 'note' }, '수집 이력이 쌓이면 추이가 표시됩니다. 참고: 한국가스공사 보도자료는 2025년 8월 하잉 기준 전국 평균을 kg당 8,374원으로 언급했습니다(시점이 달라 직접 비교 시 주의).'));
   hydrogenBidding(root);
+  pemEurope(root);
   const c4 = card('수소·에너지 뉴스 탐색기', '구글 뉴스 RSS 자동 수집(최근 30일 보관). 카테고리·언어·키워드로 필터');
   c4.style.marginTop = '14px'; root.append(c4);
   newsExplorer(c4);
@@ -676,6 +677,68 @@ function hydrogenBidding(root) {
    <li><a href="https://www.kpx.or.kr/board.es?mid=a11201000000&bid=0042&act=view&list_no=76081" target="_blank">KPX 2025-10-17 “2025년 청정수소발전시장 경쟁입찰 취소 공고”</a> · 입찰 시스템 <a href="https://kchps.kmos.kr" target="_blank">kchps.kmos.kr</a></li>
    ${D.notices.filter(n => n.tag === '수소').map(n => `<li><span class="badge h2">KPX 공지</span><a href="${esc(n.url)}" target="_blank">${esc(n.title)}</a> (${n.date})</li>`).join('')}</ul>`;
   root.append(src);
+}
+function pemEurope(root) {
+  const box = (t, body, bg = '#f7f9fc') => `<div style="background:${bg};border:1px solid var(--line);border-radius:10px;padding:10px 12px"><b style="color:var(--navy)">${t}</b><div style="margin-top:3px">${body}</div></div>`;
+  const A = (u, t) => `<a href="${u}" target="_blank" rel="noopener">${t}</a>`;
+  root.append(H('div', { style: 'margin-top:22px' }, `<h2 style="margin:0 0 4px;font-size:19px;color:var(--navy)">PEM 수전해 사업화 · 유럽/노르딕 시장 워치</h2><div style="color:var(--sub);font-size:12.5px">현대차그룹 PEM 수전해의 공개 로드맵과, 유럽·노르딕 수전해 시장의 수요·정책·경쟁 구도를 한곳에 정리. 관련 뉴스는 아래 뉴스 탐색기의 <b>PEM·수전해 / Nordic H2 / Global PEM</b> 카테고리로 매일 수집.</div><div class="note" style="margin-top:4px">기준 2026-11-16. 공식 발표·공개 보고서만 사용(기업의 비공개 사업 계획은 다루지 않음). 출처마다 가격 범위(설치/출고, 스택/시스템)가 달라 직접 비교 시 주의.</div>`));
+  const row1 = H('div', { class: 'grid g2', style: 'margin-top:10px' });
+  const k1 = card('현대차그룹 PEM 수전해 로드맵 <span class="badge h2">공식 발표</span>', '연료전지 부품·양산 기술을 수전해에 공용화하는 전략');
+  k1.innerHTML += `<table class="t"><tr><th>시점</th><th style="text-align:left">내용</th></tr>
+   <tr><td>운영 중</td><td class="l">광주 <b>1MW</b> 컨테이너형 실증 · 보령·부안·제주 추가 실증 추진</td></tr>
+   <tr><td>2026.11</td><td class="l"><b>5MW급 전해조 모듈(ESM)</b> 첫 공개: 스택 12개, 연 약 700t, 병렬 연결로 수백 MW 확장 (WHE 2026)</td></tr>
+   <tr><td>2027</td><td class="l">울산 연료전지 신공장에서 <b>국내 최초 PEM 수전해기 양산</b></td></tr>
+   <tr><td>2028</td><td class="l">제주 5MW급 실증 착수</td></tr>
+   <tr><td>2029</td><td class="l">새만금 20MW급 이상 수전해 플랜트 추진</td></tr>
+   <tr><td>2026.10</td><td class="l">현대엔지니어링, 제주 <b>ALK+PEM 하이브리드</b> 수전해 국책과제 참여(싼 ALK + 빠른 PEM 조합)</td></tr></table>
+   <div class="grid g2" style="gap:10px;margin-top:10px">${box('내세우는 강점', '연료전지와 전극·분리판·막 등 핵심부품 공용화 · 국산화 90% 이상 · 부하 추종 초당 10% · 99.999% 고순도')}${box('유럽 메시지', 'Hyundai Energy & Hydrogen Europe: "유럽 수소 전환의 신뢰받는 파트너가 되겠다" (World Hydrogen Summit 2026, 5/21)')}</div>`;
+  const k2 = card('기술 포지션: PEM vs 알카라인(중국산 포함)', '같은 수소를 만드는 두 방식. 알카라인은 싸고 크고, PEM은 비싸지만 작고 빠르다');
+  k2.innerHTML += `<table class="t"><tr><th>항목</th><th style="text-align:left">알카라인(ALK)</th><th style="text-align:left">PEM</th></tr>
+   <tr><td>시스템 가격</td><td class="l">중국 $500~1,100/kW · 중국 외 $1,900~2,500 (IEA, 2025 설치 기준)</td><td class="l">중국 $350~550/kW (OIES 2026) · 유럽 $1,000~1,600 (세계은행, 출고가)</td></tr>
+   <tr><td>전력 소모(서구 제품)</td><td class="l">54.6 kWh/kg</td><td class="l">55.1 kWh/kg (BNEF 2026)</td></tr>
+   <tr><td>운전 범위·속도</td><td class="l">25~110%, 초당 5%</td><td class="l">5~110%, 초당 10% (선그로우 동일사 비교)</td></tr>
+   <tr><td>재생에너지 추종 오차</td><td class="l">13.4%</td><td class="l">1.7% (풍력·태양광 연계 모델 연구)</td></tr>
+   <tr><td>시장 비중</td><td class="l">세계 건설 중 프로젝트의 84%</td><td class="l">유럽 운영 설비의 62%</td></tr>
+   <tr><td>약점</td><td class="l">변동 대응·덩치. 중국산은 현장 성능 리스크(시노펙 쿠차 기대 생산의 1/3)</td><td class="l">백금·이리듐 귀금속, 높은 CAPEX</td></tr></table>
+   <div class="note">중국은 원가·전력 소모·대형화(1대 1,000~3,000Nm³/h), 유럽·미국은 변동 대응·안정성 기준에 집중. 세계 알카라인 생산능력의 86%가 중국.</div>`;
+  row1.append(k1, k2); root.append(row1);
+  const kp = H('div', { class: 'grid g4', style: 'margin-top:14px' });
+  kp.append(
+    kpi('유럽 운영 수전해', '663', 'MW', 'PEM 비중 62% · Hydrogen Europe, 2026 상반기'),
+    kpi('2030 계획 대비 FID', '약 3', 'GW', '계획 31GW 중 · 프로젝트 624건 중 운영 59·취소 74 (EIC, 2026.8)'),
+    kpi('2026 상반기 FID', '480', 'MW', '8건 · FID 이후 설비의 29% 독일, 20% 스웨덴'),
+    kpi('EU 수소은행 3차', '€12억', '', '13개 프로젝트 · 낙찰가 대부분 €1/kg 미만 (2026.5)')
+  );
+  root.append(kp);
+  const row2 = H('div', { class: 'grid g2', style: 'margin-top:14px' });
+  const e1 = card('유럽 수요 드라이버와 리스크', '수전해 주문은 규제가 만든 수요(RED III)와 보조금 경매가 좌우');
+  e1.innerHTML += `<div class="grid" style="gap:8px">${box('수요: RED III', '2030년 산업용 수소의 <b>42%</b>를 재생수소(RFNBO)로 의무화. 독일·이탈리아·네덜란드는 법제화, 프랑스·폴란드·벨기에는 지연(2026.7). 정유·e-fuel이 대형 구매자로 전환 중')}${box('리스크: RED IV 논의', 'RED IV 영향평가에서 RFNBO 의무를 일반 CO₂ 감축 목표로 대체하는 안이 거론 → 업계 반발(Hydrogen Europe, 2026.10)', '#fff7e6')}${box('비중국 요건', 'EU 수소은행: 전해조(스택 포함) <b>75% 이상 중국 외 생산</b> 요건(2차부터, IF26 초안도 유지) → 비중국 OEM에 열린 창구')}${box('공급사 구도', '운영 기준 Siemens Energy PEM 160MW · Nel 88MW · ITM 80MW, 건설 중 thyssenkrupp nucera(ALK) 약 1.2GW. 확정 설비 4.2GW vs 2030 목표 30~58GW (ACER)')}</div>`;
+  const e2 = card('노르딕 4개국 스냅샷', '싼 무탄소 전력(수력·풍력) + 수출형 대형 프로젝트');
+  e2.innerHTML += `<table class="t"><tr><th>국가</th><th style="text-align:left">현황</th><th style="text-align:left">EU 수소은행 3차 (2026.5)</th></tr>
+   <tr><td>덴마크</td><td class="l">운영 110MW(2026.8), 2030 파이프라인 1.2GW, PtX 목표 4~6GW. 독일행 수소 파이프라인 2025.9 승인</td><td class="l">MorGen 300MW(€0.95/kg, 독일산 전해조) · Hy2gen ALBA 100MW(€0.97, 프랑스산)</td></tr>
+   <tr><td>핀란드</td><td class="l">RED III 수송 목표 법제화</td><td class="l"><b>Cloudberry 500MW, €0.44/kg</b> (3차 최대 낙찰)</td></tr>
+   <tr><td>스웨덴</td><td class="l">유럽 FID 이후 설비의 20%(독일 다음). Stegra(H2 Green Steel) 740MW 철강용</td><td class="l">-</td></tr>
+   <tr><td>노르웨이</td><td class="l">GreenH Bodø 20MW FID(2025.1). 자국 OEM Nel: 3분기 PEM 수주 NOK 2.45억(+473%)</td><td class="l">Gen2-LH2 12MW · RogalandH2 12.5MW (해운·항공 바스켓, €3.48~3.49)</td></tr></table>
+   <div class="note">낙찰 프로젝트 전해조 원산지는 미국·노르웨이·독일·프랑스·영국 등 비중국. 낙찰가가 €1/kg 밑이라 개발사는 CAPEX에 매우 민감.</div>`;
+  row2.append(e1, e2); root.append(row2);
+  const ck = card('체크포인트 (PEM 진입 관점)', '공개 자료로 본 기회·위협과 다음에 확인할 것');
+  ck.style.marginTop = '14px';
+  ck.innerHTML += `<div class="grid g4" style="gap:10px">
+   ${box('기회', '비중국 요건 + 풍력 변동 대응 + 고순도 수요 → 유연한 비중국 PEM에 유리. 유럽은 이미 운영 설비의 62%가 PEM', '#eef6ff')}
+   ${box('경쟁', '운영 1~3위가 모두 PEM(Siemens Energy·Nel·ITM). 노르웨이 Nel은 홈그라운드, PEM 수주 반등 중', '#eef6ff')}
+   ${box('가격 압박', '수소은행 낙찰가 €0.44~1/kg, 중국 PEM 시스템 $350~550/kW → 가격 경쟁력이 진입 조건', '#fff7e6')}
+   ${box('수요 불확실', '2030 계획 대비 FID 약 10%, 취소 74건. RED IV 방향에 따라 수요 자체가 흔들릴 수 있음', '#fff7e6')}
+  </div>
+  <div style="margin-top:10px;font-size:13px"><b>다음 확인</b>: EU 수소은행 IF26 조건·결과 · 각국 RED III 법제화와 RED IV 방향 · 덴마크-독일 수소 파이프라인 FID · 노르딕 대형 프로젝트 FID/취소 · 경쟁 OEM 수주(Nel·Siemens Energy·ITM) · 현대차그룹 울산 양산·해외 실증 발표</div>`;
+  root.append(ck);
+  const sc = card('출처', '');
+  sc.style.marginTop = '14px';
+  sc.innerHTML += `<ul style="margin:0;padding-left:18px;font-size:12.5px">
+   <li>현대차그룹 ${A('https://www.hyundaimotorgroup.com/ko/news/hyundai-motor-group-integrated-hydrogen-solution', 'WHE 2026 통합 수소 솔루션(2026-11-04)')} · ${A('https://htwo.hyundai.com/ko/technology/PEM', 'HTWO PEM 수전해')} · ${A('https://view.asiae.co.kr/article/2026110409474715309', '아시아경제: 제주 5MW(2028)·새만금 20MW+(2029)')} · ${A('https://www.hyundaimotorgroup.com/en/news/hyundai-motor-group-showcases-hydrogen-ecosystem-vision-for-europe-at-world-hydrogen-summit-2026', 'World Hydrogen Summit 2026(2026-05-21)')} · ${A('https://www.hyundaimotorgroup.com/ko/news/hyundai-engineering-green-hydrogen-electrolyzer-plant', '현대엔지니어링 하이브리드 수전해(2026-10-08)')}</li>
+   <li>${A('https://www.iea.org/commentaries/what-explains-the-cost-advantage-of-chinese-electrolysers', 'IEA: 중국 전해조 원가 우위')} · ${A('https://www.oxfordenergy.org/wpcms/wp-content/uploads/2026/07/ELECTROLYSERS-AFTER-THE-HYPE-TECHNOLOGY-MATURITY-CHINAS-RISE-AND-THE-NEW-ECONOMICS-OF-GREEN-HYDROGEN.pdf', 'OIES(2026-07)')} · ${A('https://documents1.worldbank.org/curated/en/099022326123011297/pdf/P506220-b45b0865-8706-4862-8792-d8cc71f84569.pdf', '세계은행 Electrolyzers(2026-02)')} · ${A('https://johncockerill.com/en/press-and-news/news/updated-alkaline-or-pem-electrolyzers-which-should-you-choose/', 'John Cockerill(BNEF 2026 인용)')} · ${A('https://info-support.sungrowpower.com/market-material/a042a1b8-730d-4a45-96c5-76b833d192e4.pdf', '선그로우 제품 사양')} · 추종 오차: ACS Omega(2026-04) 하이브리드 전해조 연구</li>
+   <li>${A('https://hydrogeneurope.eu/wp-content/uploads/2026/10/Clean_Hydrogen_Monitor_09-2026_withoutAnnex.pdf', 'Hydrogen Europe Clean Hydrogen Monitor(2026-10)')} · ${A('https://hydrogeneurope.eu/wp-content/uploads/2026/09/Infographic_Electrolytic-hydrogen-project-developments-in-Europe_first-part-of-2026.pdf', '2026 상반기 프로젝트 현황')} · ${A('https://hydrogeneurope.eu/wp-content/uploads/2026/10/Quarterly-Magazine_Issue-16_Design_ONLINE-FINAL.pdf', 'Hydrogen Europe Quarterly(RED IV)')} · ${A('https://www.acer.europa.eu/sites/default/files/documents/Publications/ACER-2026-Monitoring-Report-European-hydrogen-markets.pdf', 'ACER 2026')} · ${A('https://www.tradearabia.com/News/466485/Europe-has-electrolyser-capacity-but-too-few-hydrogen-projects-EIC', 'EIC 보도(2026-08)')}</li>
+   <li>${A('https://climate.ec.europa.eu/areas-action/eu-funding-climate-action/innovation-fund/calls-proposals/if25-hydrogen-auction_en', 'EU 수소은행 3차(IF25) 결과')} · ${A('https://climate.ec.europa.eu/document/download/2ea45254-79cb-4622-95ab-4fbd410a00fe_en?filename=if25_h2_auction_preliminary_information_en.pdf', '전해조 원산지')} · ${A('https://www.pnoinnovation.com/insights/if26-hydrogen-auction-draft-terms-and-conditions-open-for-consultation', 'IF26 초안')} · ${A('https://stateofgreen.com/en/wp-content/uploads/2026/10/Indstik-faerdig.pdf', '덴마크(Energinet, 2026)')} · ${A('https://www.fni.no/getfile.php/1312535-1782472186/1.%20FNI%20-%20nettside/Import%20fra%20fni.no/Filer/Publikasjoner/FNI%20Report%202%202026.pdf', 'FNI 유럽 수소정책 보고서(2026-06)')} · ${A('https://nelhydrogen.com/press-release/nel-asa-third-quarter-2026-financial-results/', 'Nel 2026년 3분기 실적')}</li></ul>`;
+  root.append(sc);
 }
 function newsExplorer(host) {
   const cats = [...new Set(D.news.flatMap(n => n.cats))];
