@@ -778,7 +778,7 @@ R.weekly = root => {
       s += catH(cat);
       for (const h of arr) {
         s += `<div style="margin:10px 0 4px;font-size:15px;font-weight:800;color:#0f172a">${rg(h.region)}${esc(h.h)}</div><ul style="margin:4px 0 0;padding-left:22px;font-size:13.5px;line-height:1.65">${(h.bullets || []).map(b => `<li>${esc(b.t || b)}${(b.sub || []).length ? `<ul style="padding-left:18px;color:#64748b;font-size:12.5px">${b.sub.map(x => `<li style="list-style:circle">${esc(x)}</li>`).join('')}</ul>` : ''}</li>`).join('')}</ul>`;
-        if ((h.sources || []).length) s += `<div style="padding-left:22px">${h.sources.map(x => link(x.url, '출처: ' + x.name)).join(' · ')}</div>`;
+        if ((h.sources || []).length) s += `<div style="padding-left:40px;color:#64748b;font-size:12px;margin-top:2px">◦ 출처 : ${h.sources.map(x => `<a href="${esc(x.url)}" target="_blank" rel="noopener" style="color:#4f6fae">${esc(x.name)}</a>`).join(', ')}</div>`;
         if ((h.implications || []).length) s += `<div style="margin:10px 0 2px;font-size:15px;font-weight:800;color:${BLUE}">시사점</div><ul style="margin:0;padding-left:22px;color:${BLUE};font-size:13.5px;line-height:1.7;font-weight:600">${h.implications.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
       }
     }
