@@ -280,7 +280,7 @@ const nPartial = stVals.filter(s=>s.state==='partial').length;
 const nBad = stVals.filter(s => s.state === 'failed' || s.state === 'unavailable').length, nRet = stVals.filter(s => s.state === 'retained').length;
 $('#hpills').innerHTML = `<span class="pill">수집·파싱 ${stVals.length}개 중 성공 ${stVals.filter(s => s.state === 'fresh').length}</span>` + (nPartial ? `<span class="pill warn">부분 성공 ${nPartial}</span>` : '') + (nRet ? `<span class="pill warn">이전값 유지 ${nRet}</span>` : '') + (nBad ? `<span class="pill bad">실패 ${nBad}</span>` : '') + (D.smpToday ? `<span class="pill">육지 SMP ${fmt(S.wavg, 2)}원/kWh</span>` : '') + (D.realtime ? `<span class="pill">예비율 ${D.realtime.reserveRate}% (${D.realtime.date} ${D.realtime.time})</span>` : '') + (D.h2.last ? `<span class="pill">수소 ${fmt(D.h2.last.national)}원/kg</span>` : '');
 
-const TABS = [['overview', '종합 브리핑'], ['price', '전력가격(SMP)'], ['model', 'SMP 추정'], ['supply', '수급·발전'], ['rec', 'REC·연료'], ['h2', '수소시장'], ['weekly', '주간 수소동향'], ['hist', '브리핑 히스토리'], ['src', '출처·정의'], ['audit', '검수 내역']];
+const TABS = [['overview', '종합 브리핑'], ['price', '전력가격(SMP)'], ['model', 'SMP 추정'], ['supply', '수급·발전'], ['rec', 'REC·연료'], ['h2', '수소시장'], ['weekly', '수소산업 동향'], ['hist', '브리핑 히스토리'], ['src', '출처·정의'], ['audit', '검수 내역']];
 const rendered = {};
 function openTab(k) {
   document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.k === k));
@@ -761,16 +761,30 @@ function newsExplorer(host) {
 }
 
 /* ---------------- 브리핑 히스토리 (2026-11-09) ---------------- */
+function priceCard(P, refDate) {
+  const c = H('div', { class: 'card', style: 'margin-top:14px;max-width:1000px;box-sizing:border-box' });
+  c.innerHTML = '<h3>수전해 가격 모니터</h3><div class="desc">공개 보고서·입찰 결과에 나온 가격을 날짜순으로 누적. $/kW는 환산값이며 범위(스택/시스템/설치)와 기준이 달라 직접 비교에 주의</div>';
+  if (!P.length) { c.innerHTML += '<div class="note">아직 수집된 가격이 없습니다.</div>'; return c; }
+  const pick = (rg, tech, scope) => P.filter(p => rg.test(p.region) && p.tech === tech && scope.test(p.scope) && p.usdPerKw).sort((a, b) => b.date.localeCompare(a.date))[0];
+  const ks = [['중국 ALK 스택', pick(/中|중국/, 'ALK', /스택/)], ['중국 ALK 시스템', pick(/中|중국/, 'ALK', /시스템/)], ['중국 PEM 시스템', pick(/中|중국/, 'PEM', /시스템/)], ['서구 ALK 시스템', pick(/유럽|서구|EU|美|미국/, 'ALK', /시스템/)], ['서구 PEM 시스템', pick(/유럽|서구|EU|美|미국/, 'PEM', /시스템/)]];
+  const usd = v => '&#36;' + fmt(v);
+  c.innerHTML += '<div class="grid" style="grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:6px 0 10px">' + ks.map(([t, p]) => '<div style="background:#f7f9fc;border:1px solid var(--line);border-radius:10px;padding:8px 10px"><div style="font-size:11.5px;color:var(--sub);font-weight:600">' + t + '</div><div style="font-size:19px;font-weight:800">' + (p ? usd(p.usdPerKw) + '<small style="font-size:11px;color:var(--sub)">/kW</small>' : '-') + '</div><div style="font-size:11px;color:var(--sub)">' + (p ? esc(p.date) + ' · ' + esc(p.source) : '데이터 없음') + '</div></div>').join('') + '</div>';
+  const p0 = s => (s || '').slice(0, 10);
+  const recent = d => refDate && d && p0(d) >= addDays(refDate, -6);
+  const rows = P.slice().sort((a, b) => b.date.localeCompare(a.date)).slice(0, 14);
+  c.innerHTML += '<table class="t"><tr><th>시점</th><th>지역</th><th>기술</th><th>범위</th><th style="text-align:left">가격</th><th>환산 /kW</th><th style="text-align:left">출처</th></tr>' + rows.map(p => '<tr><td>' + esc(p.date) + (recent(p.addedAt) ? ' <span class="badge new">NEW</span>' : '') + '</td><td>' + esc(p.region) + '</td><td>' + esc(p.tech) + '</td><td>' + esc(p.scope) + '</td><td class="l">' + esc(p.value) + (p.note ? '<div class="note" style="margin:2px 0 0">' + esc(p.note) + '</div>' : '') + '</td><td>' + (p.usdPerKw ? usd(p.usdPerKw) : '-') + '</td><td class="l"><a href="' + esc(p.url) + '" target="_blank" rel="noopener">' + esc(p.source) + '</a></td></tr>').join('') + '</table>';
+  return c;
+}
 R.weekly = root => {
-  root.innerHTML = '<div class="card"><div class="note" style="margin:0">주간 브리프를 불러오는 중…</div></div>';
+  root.innerHTML = '<div class="card"><div class="note" style="margin:0">수소산업 동향을 불러오는 중…</div></div>';
   const BLUE = '#1d4ed8', NAVY = '#1e2a4a';
   const bar = t => `<div style="background:#eef1f6;border-radius:4px;padding:7px 14px;margin:22px 0 10px;font-size:18px;font-weight:800;color:${BLUE}">${t}</div>`;
   const catH = t => `<div style="font-size:15.5px;font-weight:800;color:#2f5bb7;margin:16px 0 6px">${esc(t)}</div>`;
   const rg = r => r ? `${esc(r)} ` : '';
   const link = (u, n) => u ? `<a href="${esc(u)}" target="_blank" rel="noopener" style="font-size:11.5px;color:#64748b">${esc(n || '원문')}</a>` : '';
   const issueHTML = w => {
-    let s = `<div style="text-align:center;margin:6px 0 2px"><div style="font-size:34px;font-weight:900;letter-spacing:-1px;color:${NAVY}">주간 수소산업 동향</div><div class="note" style="margin-top:2px">공개 뉴스·보도자료 기반 자체 정리 · 매주 월요일 업데이트 · 회사 자료 아님</div></div>`;
-    s += `<div style="text-align:right;font-size:12.5px;color:#475569;margin-top:6px">${esc(w.date.replace(/-/g, '.'))} / Vol. ${w.vol} <span style="color:#94a3b8">(대상 기간 ${esc(w.period.start.slice(5).replace('-', '/'))}~${esc(w.period.end.slice(5).replace('-', '/'))})</span></div>`;
+    let s = `<div style="text-align:center;margin:6px 0 2px"><div style="font-size:34px;font-weight:900;letter-spacing:-1px;color:${NAVY}">수소산업 동향</div><div class="note" style="margin-top:2px">공개 뉴스·보도자료 기반 자체 정리 · 매일 오전 업데이트 · 회사 자료 아님</div></div>`;
+    s += `<div style="text-align:right;font-size:12.5px;color:#475569;margin-top:6px">${esc(w.date.replace(/-/g, '.'))} / Vol. ${w.vol}${w.kind === 'weekly' ? ' (주간 종합)' : ''} <span style="color:#94a3b8">(대상 기간 ${esc(w.period.start.slice(5).replace('-', '/'))}~${esc(w.period.end.slice(5).replace('-', '/'))})</span></div>`;
     if (w.summary) s += `<div style="margin-top:8px;padding:10px 14px;border-left:4px solid ${BLUE};background:#f8fafc;font-size:13.5px">${esc(w.summary)}</div>`;
     s += bar('Weekly Highlights');
     const hg = {}; (w.highlights || []).forEach(h => (hg[h.cat || '주요 이슈'] ||= []).push(h));
@@ -798,10 +812,10 @@ R.weekly = root => {
     const top = H('div', { class: 'card', style: 'display:flex;gap:10px;align-items:center;flex-wrap:wrap' });
     top.innerHTML = `<b style="color:var(--navy)">지난 호 보기</b>`;
     const sel = H('select', { style: 'border:1px solid var(--line);border-radius:6px;padding:4px 8px;font:inherit' });
-    sel.innerHTML = list.map((w, i) => `<option value="${i}">Vol. ${w.vol} · ${w.date} (${w.period.start.slice(5)}~${w.period.end.slice(5)})</option>`).join('');
-    top.append(sel, H('span', { class: 'note', style: 'margin:0' }, '매주 월요일 오전 발행 · 대상: 직전 월~일 공개 뉴스'));
+    sel.innerHTML = list.map((w, i) => `<option value="${i}">Vol. ${w.vol} · ${w.date} (${w.period.start === w.period.end ? w.period.start.slice(5) : w.period.start.slice(5) + '~' + w.period.end.slice(5)})${w.kind === 'weekly' ? ' 주간' : ''}</option>`).join('');
+    top.append(sel, H('span', { class: 'note', style: 'margin:0' }, '매일 오전 발행 · 대상: 직전 호 이후 공개 뉴스(월요일은 주말 포함)'));
     const body = H('div', { class: 'card', style: 'margin-top:14px;padding:22px 30px;max-width:1000px' });
-    root.append(top, body);
+    root.append(top, priceCard(data.prices || [], list[0].date), body);
     const show = i => { body.innerHTML = issueHTML(list[i]); };
     sel.addEventListener('change', () => show(+sel.value));
     show(0);
